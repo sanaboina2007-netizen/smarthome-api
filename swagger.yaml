@@ -1,0 +1,7 @@
+openapi: 3.0.3
+info:
+  title: Advanced SmartHome API
+  version: "1.0.0"
+servers:
+  - url: https://hemaQEAgent.github.io/smarthome-api
+# ... truncated for brevity ...
