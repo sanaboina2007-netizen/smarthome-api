@@ -1,23 +1,354 @@
 openapi: 3.0.0
 info:
-  title: SmartHome API (Minimal)
+  title: Advanced SmartHome API
   version: 1.0.0
+  description: API for controlling smart home devices such as lights, AC, locks, and sensors.
 
 servers:
   - url: https://sanaboina2007-netizen.github.io/smarthome-api
 
+tags:
+  - name: Lights
+    description: Control smart lights
+  - name: AC
+    description: Manage air conditioning units
+  - name: Locks
+    description: Smart lock operations
+  - name: Sensors
+    description: Read sensor data
 paths:
-  /ping:
+  /lights:
     get:
-      summary: Health check
+      tags:
+        - Lights
+      summary: Get list of all lights
       responses:
         '200':
-          description: SmartHome API is running
+          description: List of lights
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: ok
+                type: array
+                items:
+                  $ref: '#/components/schemas/Light'
+
+  /lights/{id}/on:
+    post:
+      tags:
+        - Lights
+      summary: Turn a light ON
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Light turned ON
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LightStatus'
+
+  /lights/{id}/off:
+    post:
+      tags:
+        - Lights
+      summary: Turn a light OFF
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Light turned OFF
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LightStatus'
+  /ac:
+    get:
+      tags:
+        - AC
+      summary: Get list of all AC units
+      responses:
+        '200':
+          description: List of AC units
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AC'
+
+  /ac/{id}/power:
+    post:
+      tags:
+        - AC
+      summary: Turn AC ON or OFF
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                state:
+                  type: string
+                  enum: [on, off]
+                  example: on
+      responses:
+        '200':
+          description: Power state changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ACStatus'
+
+  /ac/{id}/temperature:
+    post:
+      tags:
+        - AC
+      summary: Set AC temperature
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                temperature:
+                  type: integer
+                  example: 24
+      responses:
+        '200':
+          description: Temperature updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ACStatus'
+  /locks:
+    get:
+      tags:
+        - Locks
+      summary: Get list of all smart locks
+      responses:
+        '200':
+          description: List of locks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lock'
+
+  /locks/{id}/lock:
+    post:
+      tags:
+        - Locks
+      summary: Lock the smart lock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lock engaged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LockStatus'
+
+  /locks/{id}/unlock:
+    post:
+      tags:
+        - Locks
+      summary: Unlock the smart lock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lock disengaged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LockStatus'
+  /sensors:
+    get:
+      tags:
+        - Sensors
+      summary: Get list of all sensors
+      responses:
+        '200':
+          description: List of sensors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sensor'
+
+  /sensors/{id}/reading:
+    get:
+      tags:
+        - Sensors
+      summary: Get latest sensor reading
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Latest sensor reading
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorReading'
+
+  /sensors/{id}/history:
+    get:
+      tags:
+        - Sensors
+      summary: Get historical sensor readings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: hours
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 24
+      responses:
+        '200':
+          description: Historical readings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SensorReading'
+components:
+  schemas:
+    Light:
+      type: object
+      properties:
+        id:
+          type: string
+          example: light-001
+        name:
+          type: string
+          example: Living Room Light
+        status:
+          type: string
+          enum: [on, off]
+          example: off
+        brightness:
+          type: integer
+          example: 70
+
+    LightStatus:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: string
+          enum: [on, off]
+
+    AC:
+      type: object
+      properties:
+        id:
+          type: string
+          example: ac-101
+        location:
+          type: string
+          example: Bedroom
+        temperature:
+          type: integer
+          example: 22
+        power:
+          type: string
+          enum: [on, off]
+
+    ACStatus:
+      type: object
+      properties:
+        message:
+          type: string
+        power:
+          type: string
+        temperature:
+          type: integer
+
+    Lock:
+      type: object
+      properties:
+        id:
+          type: string
+          example: lock-001
+        door:
+          type: string
+          example: Front Door
+        state:
+          type: string
+          enum: [locked, unlocked]
+
+    LockStatus:
+      type: object
+      properties:
+        message:
+          type: string
+        state:
+          type: string
+          enum: [locked, unlocked]
+
+    Sensor:
+      type: object
+      properties:
+        id:
+          type: string
+          example: sensor-001
+        type:
+          type: string
+          example: temperature
+        location:
+          type: string
+          example: Kitchen
+
+    SensorReading:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          example: "2025-01-18T10:30:00Z"
+        value:
+          type: number
+          example: 24.6
