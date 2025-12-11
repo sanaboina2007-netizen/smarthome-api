@@ -352,3 +352,268 @@ components:
         value:
           type: number
           example: 24.6
+            /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login and receive JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: hema@example.com
+                password:
+                  type: string
+                  example: Password123
+      responses:
+        '200':
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+  /scenes:
+    get:
+      tags:
+        - Scenes
+      summary: Get all scenes
+      responses:
+        '200':
+          description: List of scenes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Scene'
+
+    post:
+      tags:
+        - Scenes
+      summary: Create a new scene
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SceneCreate'
+      responses:
+        '201':
+          description: Scene created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scene'
+
+  /scenes/{id}/activate:
+    post:
+      tags:
+        - Scenes
+      summary: Activate a scene
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scene activated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  activated:
+                    type: boolean
+                    example: true
+  /automations:
+    get:
+      tags:
+        - Automations
+      summary: Get all automations
+      responses:
+        '200':
+          description: List of automations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Automation'
+
+    post:
+      tags:
+        - Automations
+      summary: Create an automation rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomationCreate'
+      responses:
+        '201':
+          description: Automation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Automation'
+
+  /automations/{id}/trigger:
+    post:
+      tags:
+        - Automations
+      summary: Trigger an automation manually
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Automation executed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+  /rooms:
+    get:
+      tags:
+        - Rooms
+      summary: Get list of all rooms
+      responses:
+        '200':
+          description: List of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+
+    post:
+      tags:
+        - Rooms
+      summary: Create a new room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomCreate'
+      responses:
+        '201':
+          description: Room created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+
+  /rooms/{id}:
+    get:
+      tags:
+        - Rooms
+      summary: Get room details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Room details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+
+  /rooms/{id}/devices:
+    post:
+      tags:
+        - Rooms
+      summary: Add a device to a room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceId:
+                  type: string
+                  example: light-001
+      responses:
+        '200':
+          description: Device added to room
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  added:
+                    type: boolean
+                    example: true
+  /webhooks:
+    post:
+      tags:
+        - Webhooks
+      summary: Register an external webhook URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  example: https://example.com/webhook-endpoint
+      responses:
+        '201':
+          description: Webhook registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  registered:
+                    type: boolean
+                    example: true
+
+  /webhooks/test:
+    post:
+      tags:
+        - Webhooks
+      summary: Send test event to the registered webhook
+      responses:
+        '200':
+          description: Test event delivered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  delivered:
+                    type: boolean
+                    example: true
+
